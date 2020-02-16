@@ -29,11 +29,11 @@ jobs:
             echo ::set-env name=skip_tests::false
           fi
 
-      - name: if not skip
+      - name: if not eq skip
         if: env.skip_tests == 'false'
         run: echo "installing and stuff $skip_tests"
 
-      - name: if skip
+      - name: if eq skip
         if: env.skip_tests == 'true'
         run: echo "skipping tests as requested in commit message $skip_tests"
 
