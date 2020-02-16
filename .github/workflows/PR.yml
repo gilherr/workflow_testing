@@ -23,18 +23,18 @@ jobs:
           if git log -2 --format=%s | grep '\[skip tests\]' 2>&1 > /dev/null; then
             echo "Skipping Build and Tests"
             # exit 78 # destroy workflow
-            echo ::set-env name=skip_tests::skip
+            echo ::set-env name=skip_tests::true
           else
             echo "setting skip to false"
-            echo ::set-env name=skip_tests::no_skip
+            echo ::set-env name=skip_tests::false
           fi
 
-      - name: Testing commitmsg env setup
-        if: env.skip_tests != 'skip'
+      - name: if not skip
+        if: env.skip_tests == 'false'
         run: echo "installing and stuff $skip_tests"
 
-      - name: Testing commitmsg env setup
-        if: contains( env.skip_tests, 'no_skip') 
+      - name: if skip
+        if: env.skip_tests == 'true'
         run: echo "skipping tests as requested in commit message $skip_tests"
 
       - name: Catching the skip exit code
