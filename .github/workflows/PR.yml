@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-18.04
     env:
       CI: "github_actions"
-      SKIP: ${{ contains('hello world', 'wor') }}
     strategy:
       fail-fast: false
     steps:
@@ -19,23 +18,19 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: should it be skipped?
-        env:
-          COMMIT_FILTER: "[skip tests]"
-        run: |
-          # Get last commit message
-          readonly local last_commit_log=$(git log -1 --pretty=format:"%s")
-          echo "last commit log: $last_commit_log"
+      # - name: should it be skipped?
+      #   env:
+      #     COMMIT_FILTER: "[skip tests]"
+      #   run: |
+      #     readonly local last_commit_log=$(git log -1 --pretty=format:"%s")
+      #     readonly local filter_count=$(echo "$last_commit_log" | grep -c "$COMMIT_FILTER" )
 
-          readonly local filter_count=$(echo "$last_commit_log" | grep -c "$COMMIT_FILTER" )
-          echo "number of occurence of '$COMMIT_FILTER' in '$last_commit_log': $filter_count"
-
-          if [[ "$filter_count" -eq 0 ]]; then
-            echo "all good, continue"
-          else
-            echo "the last commit log \"$last_commit_log\" contains \"$COMMIT_FILTER\", stopping"
-            exit 78
-          fi
+      #     if [[ "$filter_count" -eq 0 ]]; then
+      #       echo "No skip request found"
+      #     else
+      #       echo "Found $COMMIT_FILTER in last commit"
+      #       exit 78
+      #     fi
 
       - name: get commit message
         run: |
@@ -48,8 +43,10 @@ jobs:
         if: contains( env.commitmsg , '[skip tests]' )
         run: echo "skipping tests as requested in commit message $commitmsg"
 
-      - name: Testing env reading
-        run: echo "SKIP - $SKIP"
+      - name: Catching the skip exit code
+        if: failure()
+        run: echo "Skip request found, this is the failure step"
+
         ################ Data Dump ################
 
       - name: Dump job context
