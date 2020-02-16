@@ -35,15 +35,13 @@ jobs:
       - name: Checkout files
         uses: actions/checkout@v2
 
-      - name: Print commit message
-        run: echo "$(git log -2 --format=%s)" && echo "$(git log -2 --format=%s | grep skip)" && echo $(git log -1 --pretty=format:"%s")
-
-      - name: Get Commit Message
-        run: echo "::set-env name=commitmsg::$(git log -2 --format=%s)"
-
-      - name: Print stuff
-        run: git log -3 --format="%s"
-
+      - name: get commit message
+        run: |
+           echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
+           
+      - name: show commit message
+        run : echo $commitmsg
+        
       - name: Testing commitmsg env setup
         if: contains( env.commitmsg , '[skip tests]' )
         run: echo "skipping tests as requested in commit message $commitmsg"
