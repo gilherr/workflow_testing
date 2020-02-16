@@ -36,8 +36,7 @@ jobs:
         run: echo ::set-env name=skip_tests::$(git log --format=%B -n 1 ${{ github.event.after }} | grep "\[skip test\]")
 
       - name: Testing commitmsg env setup
-        if: env.skip_tests
-        run: echo "skipping tests as requested in commit message $commitmsg"
+        run: echo "skipping tests as requested in commit message $skip_tests"
 
       - name: Catching the skip exit code
         if: failure()
