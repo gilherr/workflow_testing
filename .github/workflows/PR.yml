@@ -46,10 +46,6 @@ jobs:
         if: env.skip_tests
         run: echo "skipping tests as requested in commit message $skip_tests"
 
-      - name: Testing commitmsg $env setup
-        if: ${{ $skip_tests }}
-        run: echo "skipping tests as requested in commit message $skip_tests"
-
       - name: Catching the skip exit code
         if: failure()
         run: echo "Skip request found, this is the failure step $skip_tests"
