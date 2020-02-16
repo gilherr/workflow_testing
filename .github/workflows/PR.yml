@@ -1,10 +1,6 @@
 name: GilerPR
 
-on:
-  pull_request:
-    types: ["opened","synchronize","reopened"]
-  pull_request_review_comment:
-    types: [created]
+on: issue_comment
 
 jobs:
   main_job:
