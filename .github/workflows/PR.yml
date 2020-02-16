@@ -1,0 +1,45 @@
+name: GilerPR
+
+on:
+  pull_request:
+    types: ["opened","synchronize","reopened"]
+
+jobs:
+  main_job:
+    name: main_job_name
+    runs-on: ubuntu-18.04
+    env:
+      CI: "github_actions"
+    strategy:
+      fail-fast: false
+    steps:
+      - name: Checkout files
+        uses: actions/checkout@v2
+        
+      - name: Print commit message
+        run: echo "$(git log -2 --format=%s)" && echo "$(git log -2 --format=%s) | grep skip"
+        
+      - name: Get Commit Message
+        run: echo "::set-env name=commitmsg::$(git log -2 --format=%s)"
+
+      - name: Set up Node v8
+        uses: actions/setup-node@v1
+        with:
+          node-version: '8'
+
+      - name: Testing commitmsg env setup
+        if: contains( env.commitmsg , '[skip tests]' )
+        run: echo "skipping tests as requested in commit message $commitmsg"
+
+        ################ Data Dump ################
+
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+
+        ################ Data Dump End ################
