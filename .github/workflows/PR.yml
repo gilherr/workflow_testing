@@ -46,11 +46,11 @@ jobs:
           fi
 
       - name: Testing commitmsg env setup
-        if: env.skip_tests != "skip"
+        if: "!contains( env.skip_tests, 'skip')"
         run: echo "installing and stuff $skip_tests"
 
       - name: Testing commitmsg env setup
-        if: env.skip_tests == "no_skip"
+        if:  contains( env.skip_tests, 'no_skip')
         run: echo "skipping tests as requested in commit message $skip_tests"
 
       - name: Catching the skip exit code
