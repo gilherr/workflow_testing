@@ -41,6 +41,9 @@ jobs:
       - name: Get Commit Message
         run: echo "::set-env name=commitmsg::$(git log -2 --format=%s)"
 
+      - name: Print stuff
+        run: git log -3 --format="%s"
+
       - name: Testing commitmsg env setup
         if: contains( env.commitmsg , '[skip tests]' )
         run: echo "skipping tests as requested in commit message $commitmsg"
