@@ -36,6 +36,7 @@ jobs:
         run: |
           if git log -2 --format=%s | grep '\[skip tests\]' 2>&1 > /dev/null; then
             echo "Skipping Build and Tests"
+            # exit 78 # destroy workflow
             echo ::set-env name=skip_tests::true
           else
             echo "setting skip to false"
