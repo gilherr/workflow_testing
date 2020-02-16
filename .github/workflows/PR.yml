@@ -20,6 +20,18 @@ jobs:
         with:
           fetch-depth: 2
 
+      - uses: khan/pull-request-comment-trigger@master
+        id: check
+        with:
+          trigger: '[skip tests]'
+          reaction: rocket
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      - run: 'echo Found it!'
+        if: steps.check.outputs.triggered == 'true'
+
+
+
       # - name: should it be skipped?
       #   env:
       #     COMMIT_FILTER: "[skip tests]"
