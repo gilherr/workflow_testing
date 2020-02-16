@@ -18,29 +18,25 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: should it be skipped?
-        env:
-          COMMIT_FILTER: "[skip tests]"
-        run: |
-          readonly local last_commit_log=$(git log -1 --pretty=format:"%s")
-          readonly local filter_count=$(echo "$last_commit_log" | grep -c "$COMMIT_FILTER" )
+      # - name: should it be skipped?
+      #   env:
+      #     COMMIT_FILTER: "[skip tests]"
+      #   run: |
+      #     readonly local last_commit_log=$(git log -1 --pretty=format:"%s")
+      #     readonly local filter_count=$(echo "$last_commit_log" | grep -c "$COMMIT_FILTER" )
 
-          if [[ "$filter_count" -eq 0 ]]; then
-            echo "No skip request found"
-          else
-            echo "Found $COMMIT_FILTER in last commit"
-            exit 78
-          fi
+      #     if [[ "$filter_count" -eq 0 ]]; then
+      #       echo "No skip request found"
+      #     else
+      #       echo "Found $COMMIT_FILTER in last commit"
+      #       exit 78
+      #     fi
 
-      - name: get commit message
-        run: |
-           echo ::set-env name=commitmsg::$(git log --format=%B -n 1 ${{ github.event.after }})
-
-      - name: show commit message
-        run : echo $commitmsg
+      - name: Set Skip Flag
+        run: echo ::set-env name=skip_tests::$(git log --format=%B -n 1 ${{ github.event.after }} | grep "\[skip test\]")
 
       - name: Testing commitmsg env setup
-        if: contains( env.commitmsg , '[skip tests]' )
+        if: $skip_tests
         run: echo "skipping tests as requested in commit message $commitmsg"
 
       - name: Catching the skip exit code
