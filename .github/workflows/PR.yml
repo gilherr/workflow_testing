@@ -23,6 +23,10 @@ jobs:
             # exit 78 # destroy workflow
           fi
 
+          if git log -2 --format=%s | grep '\[run tests\]' 2>&1 > /dev/null; then
+            echo ::set-env name=run_tests::true
+          fi
+
           if git log -2 --format=%s | grep '\[run percy\]' 2>&1 > /dev/null; then
             echo ::set-env name=percy_tokens::true
           fi
@@ -30,6 +34,7 @@ jobs:
           if git log -2 --format=%s | grep '\[deploy qa\]' 2>&1 > /dev/null; then
             echo ::set-env name=deploy_qa::true
           fi
+
 
       - name: Test
         if: env.skip_tests != 'true'
@@ -40,3 +45,12 @@ jobs:
         env:
           SECRETS_N_STUFF: shh
         run: echo "deploying to staging $SECRETS_N_STUFF"
+
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: contains work?
+        if: contains(github.event.head_commit.message, '[skip tests]')
+        run: echo "got skip tests from the contains function"
