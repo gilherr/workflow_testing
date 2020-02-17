@@ -5,42 +5,38 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  main_job:
-    name: main_job_name
+  test:
+    name: Run Tests
     runs-on: ubuntu-18.04
     env:
       CI: "github_actions"
-    strategy:
-      fail-fast: false
     steps:
       - name: Checkout files
         uses: actions/checkout@v2
         with:
           fetch-depth: 2
 
-      - name: Set skip_tests Flag
+      - name: Set Flags
         run: |
           if git log -2 --format=%s | grep '\[skip tests\]' 2>&1 > /dev/null; then
-            # exit 78 # destroy workflow
             echo ::set-env name=skip_tests::true
+            # exit 78 # destroy workflow
+          fi
+
+          if git log -2 --format=%s | grep '\[run percy\]' 2>&1 > /dev/null; then
+            echo ::set-env name=percy_tokens::true
           fi
 
           if git log -2 --format=%s | grep '\[deploy qa\]' 2>&1 > /dev/null; then
             echo ::set-env name=deploy_qa::true
           fi
 
-      - name: if not skip
+      - name: Test
         if: env.skip_tests != 'true'
-        run: echo "Not skipping tests"
+        run: echo "running tests"
 
-      - name: if deploy
+      - name: Deploy QA
         if: env.deploy_qa
-        run: echo "deploying to staging"
-
-      - name: if both
-        if: env.deploy_qa && env.skip_tests
-        run: echo "deploying to qa wihtout testing"
-
-      - name: Catching failure
-        if: failure()
-        run: echo "Something went wrong"
+        env:
+          SECRETS_N_STUFF: shh
+        run: echo "deploying to staging $SECRETS_N_STUFF"
