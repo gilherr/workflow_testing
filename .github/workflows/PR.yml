@@ -33,7 +33,7 @@ jobs:
 
       - name: Test
         if: env.skip_tests != 'true'
-        run: echo "running tests"
+        run: echo "running tests with - [$percy_tokens]"
 
       - name: Deploy QA
         if: env.deploy_qa
