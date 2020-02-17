@@ -17,9 +17,7 @@ jobs:
           fetch-depth: 2
 
       - name: Set COMMIT_MSG
-        run: |
-          echo ::set-env name=COMMIT_MSG::$(git log -2 --format=%s)
-          echo $COMMIT_MSG
+        run: echo ::set-env name=COMMIT_MSG::$(git log -2 --format=%s)
 
       - name: Set Flags
         run: |
@@ -40,11 +38,14 @@ jobs:
             echo ::set-env name=deploy_qa::true
           fi
 
-      - name: github.event.before
-        run: echo $(git log --format=%B -n 1 ${{ github.event.before }})
+      - name: Percy Setup
+        if: contains( env.COMMIT_MSG, '[run percy]')
+        env:
+          PERCY_TOKEN: da_token
+        run: echo "running tests with - [$PERCY_TOKEN]"
 
       - name: Test
-        if: env.skip_tests != 'true'
+        if: contains( env.COMMIT_MSG, '[skip tests]') != 'true'
         run: echo "running tests with - [$percy_tokens]"
 
       - name: Deploy QA
@@ -59,8 +60,8 @@ jobs:
         run: echo "$GITHUB_CONTEXT"
 
       - name: contains work?
-        if: contains(github.event.head_commit.message, '[skip tests]')
-        run: echo "got skip tests from the contains function"
+        if: contains( env.COMMIT_MSG, '[skip tests]')
+        run: echo "skipping tests"
 
       - name: print COMMIT_MSG
         run: echo $COMMIT_MSG
