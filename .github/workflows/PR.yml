@@ -45,7 +45,7 @@ jobs:
         run: echo "running tests with - [$PERCY_TOKEN]"
 
       - name: Test
-        if: contains( env.COMMIT_MSG, '[skip tests]') != 'true'
+        if: contains( env.COMMIT_MSG, '[skip tests]') != true
         run: echo "running tests with - [$percy_tokens]"
 
       - name: Deploy QA
